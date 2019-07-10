@@ -5,6 +5,7 @@ import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
 import com.treasuredata.client.ExponentialBackOff;
 import com.treasuredata.client.TDClient;
+import com.treasuredata.client.model.TDJob;
 import com.treasuredata.client.model.TDJobRequest;
 import com.treasuredata.client.model.TDJobSummary;
 import com.treasuredata.client.model.TDResultFormat;
@@ -32,40 +33,44 @@ public class QueryExecutor {
      * @param sql sql statement
      * @return
      */
-    public String execute(String database, String engine, String format, String sql) {
+    public String execute(String database, String engine, String format, String sql) throws InterruptedException, Exception {
         Properties properties = new Properties();
-        TDClient client;
-        // Retrieve resource
-        InputStream is = this.getClass().getResourceAsStream("/tdclient.properties");
-        try {
+        TDClient client = TDClient.newClient();
+        try { // try using the property files where user can define TD API key and endpoint
+            InputStream is = this.getClass().getResourceAsStream("/tdclient.properties");
             properties.load(is);
-            // This overrides the default configuration parameters with the given Properties
             client = TDClient.newBuilder().setProperties(properties).build();
+            logger.debug("API key and endpoint are override by values in the property file.");
         } catch (IOException e) {
-            logger.debug("TD property file not not found, use default td.conf configuration");
-            client = TDClient.newClient();
+            logger.debug("tdclient.properties file not not found, still use default td.conf configuration");
         }
 
         String result = "";
         try {
             String jobId = "";
+            // initiate a job according to the engine type
             if (engine.toLowerCase().equals(Constants.QUERY_ENGINE_PRESTO)) {
                 // Submit a new Presto query
-                jobId = client.submit(TDJobRequest.newPrestoQuery("bryandb", "select * from orders limit 10"));
+                jobId = client.submit(TDJobRequest.newPrestoQuery(database, sql));
 
             } else if (engine.toLowerCase().equals(Constants.QUERY_ENGINE_HIVE)) {
                 // Submit a new Presto query
-                jobId = client.submit(TDJobRequest.newHiveQuery("bryandb", "select * from orders limit 10"));
+                jobId = client.submit(TDJobRequest.newHiveQuery(database, sql));
             }
 
             // Wait until the query finishes
             ExponentialBackOff backOff = new ExponentialBackOff();
             TDJobSummary job = client.jobStatus(jobId);
+
             while (!job.getStatus().isFinished()) {
                 Thread.sleep(backOff.nextWaitTimeMillis());
                 job = client.jobStatus(jobId);
             }
 
+            if (job.getStatus() != TDJob.Status.SUCCESS) {
+                throw new Exception("Query job finished with an unsuccessful statue.");
+            }
+            // output query result in a specific format according to the format type
             if (format.toLowerCase().equals(Constants.OUTPUT_FORMAT_TSV)) {
                 // Read the job results in TSV
                 result = client.jobResult(jobId, TDResultFormat.TSV, new Function<InputStream, String>() {
@@ -94,10 +99,7 @@ public class QueryExecutor {
                         }
                     }
                 });
-
             }
-        }catch (Exception e) {
-            logger.error("", e);
         }
         finally {
             client.close();

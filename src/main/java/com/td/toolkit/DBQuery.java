@@ -37,7 +37,7 @@ public class DBQuery {
         if (args.length == 0) { // print help message if the command does not have any arguments
             formatter.printHelp( Constants.MSG_HELP, options );
             System.exit(0);
-        }else if (args.length == 1 && (args[1].trim().equals("-h") || args[1].trim().equals("--help"))) { // print help message if the arguments only have "-h" and "--help" option
+        }else if (args.length == 1 && (args[0].trim().equals("-h") || args[0].trim().equals("--help"))) { // print help message if the arguments only have "-h" and "--help" option
             formatter.printHelp( Constants.MSG_HELP, options );
             System.exit(0);
         }
@@ -70,9 +70,17 @@ public class DBQuery {
             System.out.println(result);
             System.exit(0);
         }catch (ParseException e) {
-            formatter.printHelp( Constants.MSG_HELP, options );
-            logger.error( e.getMessage() );
-            logger.error("An exception occurred!", e);
+            System.out.println(e.getMessage());
+            formatter.printHelp(Constants.MSG_HELP, options );
+            logger.debug( e.getMessage(), e);
+            System.exit(0);
+        }catch (InterruptedException e) {
+            System.out.println("Query job is interrupted without succeeding, there could be an error on the Treasure Data, please contact support with the following  message.\n" + e.getMessage());
+            logger.debug( e.getMessage(), e);
+            System.exit(-1);
+        }catch (Exception e) {
+            System.out.println("Query job finished but not succeed, there could be an error on the Treasure Data Server, please contact support with the following message.\n" + e.getMessage());
+            logger.debug( e.getMessage(), e);
             System.exit(-1);
         }
     }

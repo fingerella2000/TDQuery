@@ -8,8 +8,6 @@
  */
 package com.td.toolkit.utils;
 
-
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,6 +133,7 @@ public class ArgsHandler {
             sql_st += " and time < " + max_value;
         }
 
+        sql_st += " order by time desc";
         // check limit option
         if (cmd.hasOption('l') || cmd.hasOption("limit")) {
             limit_value = cmd.getOptionValue("l");

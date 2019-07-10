@@ -1,6 +1,8 @@
 package com.td.toolkit;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +11,9 @@ import static org.junit.Assert.*;
  */
 public class DBQueryTest
 {
+
+    final static Logger logger = LoggerFactory.getLogger(DBQueryTest.class);
+
     /**
      * Rigorous Test :-)
      */
