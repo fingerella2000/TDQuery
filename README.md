@@ -84,5 +84,5 @@ Please choose your preferred way.
 1. td-client-0.9.0.jar, Java Library for Treasure Data REST API.
 2. commons-cli-1.4.jar, Apache commons-cli library used for parsing command line options.
 3. logback-classic-1.2.3.jar, Logback library for logging.
-4. AllPairs for creating test cases. (https://balasegu.weebly.com/all-pairs.html)
+4. AllPairs for creating test cases. (https://www.satisfice.com/download/allpairs)
 

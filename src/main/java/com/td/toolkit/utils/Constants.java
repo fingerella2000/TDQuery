@@ -1,6 +1,14 @@
 package com.td.toolkit.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 public class Constants {
+
+    final static Logger logger = LoggerFactory.getLogger(Constants.class);
     /**
      * Help message
      */
@@ -17,5 +25,31 @@ public class Constants {
     final public static String OUTPUT_FORMAT_CSV = "csv";
     final public static String QUERY_ENGINE_PRESTO = "presto"; // default
     final public static String QUERY_ENGINE_HIVE = "hive";
+
+    final public static Properties TABLE_COLUMNS = new Properties();
+
+    public void loadTableColumns() {
+        // using the property file to define the table schema
+        InputStream is = this.getClass().getResourceAsStream("/table_schema.properties");
+        if (is != null ) {
+            try {
+                TABLE_COLUMNS.load(is);
+            } catch (IOException e) {
+                logger.debug("table_schema.properties file is not set correctly");
+            } finally {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    logger.error("table_schema.properties file is not closed correctly.", e);
+                }
+            }
+        }
+//        SCHEMA.put("time", "bigint");
+//        SCHEMA.put("ordernumber", "bigint");
+//        SCHEMA.put("customernumber", "bigint");
+//        SCHEMA.put("orderdate", "varchar");
+//        SCHEMA.put("shippeddate", "varchar");
+//        SCHEMA.put("status", "varchar");
+    }
 
 }
