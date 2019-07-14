@@ -40,8 +40,6 @@ usage: DBQuery [Options]... DatabaseName TableName
                                default.
 ```
 
-### Access your own database in Treasure Data
-
 The database name "bryandb" and table name "orders" used in the example is only for demonstrating purpose and it was the builtin data set which are accessed using this tool.
 
 The table "orders" have some fictional purchase order information with the following coloumns:
@@ -55,15 +53,24 @@ status
 ```
 
 Time range from Sunday, January 5, 2003 3:00:00 PM(1041778800 in Unix Timestamp) to Monday, May 30, 2005 3:00:00 PM(1117465200 in Unix Timestamp). You can use this webpage to convert Unix Timestamp to human readable time. (See: https://www.epochconverter.com/)
-You will need Unix Timestamp when you want to filter query result by time.
+You will need to use time in Unix Timestamp format when you want to filter result by time.
 
-Since you may have your own data already resided in the Treasure Data and you may want to use this program to access it, you can achieve it by build this program from source code and modify the property file. Please see the section about how to build it from source.
+### Access your own database in Treasure Data
 
-After you downloaded the source code successfully, you can modify the file "tdclient.properties" in folder "src\main\resources" using your own apikey. Then continue with the build process to build an executable JAR file. Then you are good to go.
+Since you may have your own data already resided in the Treasure Data and you may want to use this program to access it, you can achieve it by build this program from source code and modify the property file. 
 
-If you have Treasure Data Toolbelt(https://toolbelt.treasuredata.com/) installed in your environment and it is already configured(run command "td -e" from command line to check if you have toolbet installed and configured), then you can simply delete the file "tdclient.properties" from folder "src\main\resources". In this way, the program will load your apikey from "home\.td\td.conf" directly.
+It requires modify some configuration file in the resources folder, so you need to download the source and repackaging after modification is done.
 
+After you downloaded the source code successfully, modify this two files below:
+
+1. Modify the content of file "tdclient.properties" in folder "src\main\resources" using your own apikey.
+
+2. Modify the content of file "table_schema.properties" in folder "src\main\resources" using your own table schema.
+
+**NOTE**: If you have Treasure Data Toolbelt(https://toolbelt.treasuredata.com/) installed in your environment and it is already configured(run command "td -e" from command line to check if you have toolbet installed and configured), then you can simply delete the file "tdclient.properties" from folder "src\main\resources". In this way, the program will load your apikey from "userhome\.td\td.conf" directly.
 Please choose your preferred way.
+
+Then continue with the build process to build an executable JAR file. Then you are ready to search your own dataset.
 
 ### How to build it from source
 
