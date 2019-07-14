@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2019 Bryan Luo. All rights reserved.
+ *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License, as
+ * published by the Free Software Foundation.
+ *
+ */
 package com.td.toolkit.utils;
 
 import org.slf4j.Logger;
@@ -13,10 +21,16 @@ public class Constants {
      * Help message
      */
     final public static String MSG_HELP = "TDQuery-(version).jar [Options]... DatabaseName TableName \n Options:\n";
-    final public static String MSG_MISSING_REQUIRED_ARGS = "DatabaseName and TableName are the only required arguments, please specify.\n ";
+    final public static String MSG_MISSING_REQUIRED_ARGS = "DatabaseName and TableName are required arguments, please specify.\n ";
 
     final public static String INVALID_ENGINE = "Invalid engine type, only presto and hive are available.";
     final public static String INVALID_FORMAT = "Invalid engine type, only tsv and csv are available.";
+    final public static String INVALID_TIME_STAMP = "Invalid time, please input the time in Unix Timestamp format.";
+    final public static String INVALID_TIME_STAMP_RANGE = "Invalid time range, the minimum time must greater than or equals to maximum time.";
+    final public static String INVALID_LIMIT = "Invalid limit, the limit should be a positive number.";
+    final public static String INVALID_DATABASE = "Invalid database name.";
+    final public static String INVALID_TABLE = "Invalid table name.";
+
 
     /**
      * Options' values
@@ -25,6 +39,7 @@ public class Constants {
     final public static String OUTPUT_FORMAT_CSV = "csv";
     final public static String QUERY_ENGINE_PRESTO = "presto"; // default
     final public static String QUERY_ENGINE_HIVE = "hive";
+    final public static String OUTPUT_COLUMN_ALL = "*"; // default
 
     final public static Properties TABLE_COLUMNS = new Properties();
 
@@ -44,12 +59,6 @@ public class Constants {
                 }
             }
         }
-//        SCHEMA.put("time", "bigint");
-//        SCHEMA.put("ordernumber", "bigint");
-//        SCHEMA.put("customernumber", "bigint");
-//        SCHEMA.put("orderdate", "varchar");
-//        SCHEMA.put("shippeddate", "varchar");
-//        SCHEMA.put("status", "varchar");
     }
 
 }
