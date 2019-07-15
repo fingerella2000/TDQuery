@@ -263,11 +263,6 @@ public class QueryExecutor {
                 // 2. validate the column name is correct
                 boolean index_zero = true;
                 for (String[] col : schema_obj.getColumns()){
-                    if (engine_value.equals(Constants.QUERY_ENGINE_HIVE)) {
-                        if (col[0].toLowerCase().equals("v")) {
-                            continue;
-                        }
-                    }
                     if (format_value.toLowerCase().equals(Constants.OUTPUT_FORMAT_TSV)) {
                         if(index_zero) {
                             returned_columns = col[0];
@@ -281,10 +276,18 @@ public class QueryExecutor {
                             returned_columns +=  "," + col[0];
                         }
                     }
+
                     if (Constants.TABLE_COLUMNS.containsKey(col[0])){
                         is_col_name_valid = true;
                     }else {
                         is_col_name_valid = false;
+                    }
+
+                    // engine hive will return another virtual column named "v" with "map" column type, I guess it was used in map reduce
+                    if (engine_value.equals(Constants.QUERY_ENGINE_HIVE)) {
+                        if (col[0].toLowerCase().equals("v")) {
+                            is_col_name_valid = false;
+                        }
                     }
                     index_zero = false;
                 }
