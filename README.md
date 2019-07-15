@@ -3,7 +3,6 @@
 ## Purpose
 
 This a free command line tool which can be used to query a database table in Treasure Data with some options to filter the result.
-All result will ordered by time(default column) in descending order.
 
 ## Usage
 
@@ -67,7 +66,7 @@ After you downloaded the source code successfully, modify this two files below:
 
 2. Modify the content of file "table_schema.properties" in folder "src\main\resources" using your own table schema.
 
-**NOTE**: If you have Treasure Data Toolbelt(https://toolbelt.treasuredata.com/) installed in your environment and it is already configured(run command "td -e" from command line to check if you have toolbet installed and configured), then you can simply delete the file "tdclient.properties" from folder "src\main\resources". In this way, the program will load your apikey from "userhome\.td\td.conf" directly.
+**NOTICE**: If you have Treasure Data Toolbelt(https://toolbelt.treasuredata.com/) installed in your environment and it is already configured(run command "td -e" from command line to check if you have toolbet installed and configured), then you can simply delete the file "tdclient.properties" from folder "src\main\resources". In this way, the program will load your apikey from "userhome\.td\td.conf" directly.
 Please choose your preferred way.
 
 Then continue with the build process to build an executable JAR file. Then you are ready to search your own dataset.
@@ -85,6 +84,10 @@ Then continue with the build process to build an executable JAR file. Then you a
 4. Run command ```mvn package```
 5. Now you will have the executable JAR file generated in the target. There will be two JAR files generated, please choose the JAR file with the name ```TDQuery-(version).jar```.
 6. Run it as an executable JAR file. The usage is the same as before.
+
+**NOTICE**: If you changed the table schema in file "table_schema.properties", the test phase may failed when running command ```mvn package``` due to all the test cases were written to test the data in sample table "bryandb.orders".
+So you can change pom.xml in the project root directory to skip the surefire by change the element from ```<skip>false</skip>``` to ```<skip>true</skip>````.
+Then you will be able to continue building it even the test failed.
 
 ## Tools and libraries used in the program
 

@@ -94,7 +94,7 @@ public class QueryExecutor {
         // 4. throw exception if no zero row returned
         long rows_returned = client.jobInfo(jobId).getNumRecords();
         if(rows_returned == 0) {
-            throw new JobFailedException("No records found.");
+            throw new JobFailedException(Constants.JOB_FINISHED_UNSUCCEED_WITH_NO_RECORD_FOUND);
         }
 
         // 5. validate if the returned columns in compliance with pre-defined table schema
@@ -149,7 +149,6 @@ public class QueryExecutor {
             }
         }
 
-        this.sqlSt += " order by time desc";
         // check limit option
         if (cmd.hasOption('l') || cmd.hasOption("limit")) {
             limit_value = cmd.getOptionValue("l");
@@ -219,6 +218,12 @@ public class QueryExecutor {
             format_value = cmd.getOptionValue("f");
         }
 
+        // get engine type from arguments
+        String engine_value = Constants.QUERY_ENGINE_PRESTO;
+        if (cmd.hasOption('e') || cmd.hasOption("engine")) {
+            engine_value = cmd.getOptionValue("e");
+        }
+
         String columns_value = Constants.OUTPUT_COLUMN_ALL;
 
         // get column option
@@ -244,8 +249,25 @@ public class QueryExecutor {
             boolean is_col_name_valid = false;
 
             if (columns_value.equals("*")){ // return all columns
+                // 1. validate the column number is correct
+                if (engine_value.equals(Constants.QUERY_ENGINE_PRESTO)) {
+                    if (schema_obj.getColumns().length != Constants.TABLE_COLUMNS.size()) {
+                        throw new JobFailedException(Constants.RETURNED_COLUMNS_NOT_MATCH_SCHEMA);
+                    }
+                }else if (engine_value.equals(Constants.QUERY_ENGINE_HIVE)){
+                    // engine hive will return another virtual column named "v" with "map" column type, I guess it was used in map reduce
+                    if (schema_obj.getColumns().length-1 != Constants.TABLE_COLUMNS.size()) {
+                        throw new JobFailedException(Constants.RETURNED_COLUMNS_NOT_MATCH_SCHEMA);
+                    }
+                }
+                // 2. validate the column name is correct
                 boolean index_zero = true;
                 for (String[] col : schema_obj.getColumns()){
+                    if (engine_value.equals(Constants.QUERY_ENGINE_HIVE)) {
+                        if (col[0].toLowerCase().equals("v")) {
+                            continue;
+                        }
+                    }
                     if (format_value.toLowerCase().equals(Constants.OUTPUT_FORMAT_TSV)) {
                         if(index_zero) {
                             returned_columns = col[0];
@@ -267,10 +289,15 @@ public class QueryExecutor {
                     index_zero = false;
                 }
                 if(!is_col_name_valid) {
-                    throw new JobFailedException("Returned columns does not match the schema.");
+                    throw new JobFailedException(Constants.RETURNED_COLUMNS_NOT_MATCH_SCHEMA);
                 }
             } else { // return columns specified in command line
                 String[] cols = columns_value.split(",");
+                // 1. validate the column number is correct
+                if (schema_obj.getColumns().length != cols.length) {
+                    throw new JobFailedException(Constants.RETURNED_COLUMNS_NOT_MATCH_SCHEMA);
+                }
+                // 2. validate the column name is correct
                 boolean index_zero = true;
                 for(String col : cols) {
                     col.trim();
@@ -295,7 +322,7 @@ public class QueryExecutor {
                     index_zero = false;
                 }
                 if(!is_col_name_valid) {
-                    throw new JobFailedException("Returned columns does not match the schema.");
+                    throw new JobFailedException(Constants.RETURNED_COLUMNS_NOT_MATCH_SCHEMA);
                 }
             }
         }else {
@@ -346,7 +373,7 @@ public class QueryExecutor {
         }
 
         if (job.getStatus() != TDJob.Status.SUCCESS) {
-            throw new JobFailedException("Query job finished with an unsuccessful status.");
+            throw new JobFailedException(Constants.JOB_FINISHED_UNSUCCEED + job.getStatus());
         }
 
         return jobId;

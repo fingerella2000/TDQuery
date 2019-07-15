@@ -24,12 +24,15 @@ public class Constants {
     final public static String MSG_MISSING_REQUIRED_ARGS = "DatabaseName and TableName are required arguments, please specify.\n ";
 
     final public static String INVALID_ENGINE = "Invalid engine type, only presto and hive are available.";
-    final public static String INVALID_FORMAT = "Invalid engine type, only tsv and csv are available.";
+    final public static String INVALID_FORMAT = "Invalid format type, only tsv and csv are available.";
     final public static String INVALID_TIME_STAMP = "Invalid time, please input the time in Unix Timestamp format.";
     final public static String INVALID_TIME_STAMP_RANGE = "Invalid time range, the minimum time must greater than or equals to maximum time.";
     final public static String INVALID_LIMIT = "Invalid limit, the limit should be a positive number.";
     final public static String INVALID_DATABASE = "Invalid database name.";
     final public static String INVALID_TABLE = "Invalid table name.";
+    final public static String RETURNED_COLUMNS_NOT_MATCH_SCHEMA = "Returned columns do not match the schema.";
+    final public static String JOB_FINISHED_UNSUCCEED = "Query job finished with an unsuccessful status.";
+    final public static String JOB_FINISHED_UNSUCCEED_WITH_NO_RECORD_FOUND = "No records found.";
 
 
     /**
