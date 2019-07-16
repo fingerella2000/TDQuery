@@ -8,8 +8,8 @@ This a free command line tool which can be used to query a database table in Tre
 
 ### How to run it from JAR file
 
-1. Download the JAR file TDQuery-1.0.jar from target folder to your local disk.
-2. Open command line interface(e.g. cmd.exe in Windows), cd to the you local disk.
+1. Download the JAR file TDQuery-(version).jar from release tab.
+2. Open command line interface(e.g. cmd.exe in Windows), cd to the you local disk where the JAR was downloaded.
 3. Run command ```java -jar TDQuery-(version).jar bryandb orders``` to execute a query.
 4. Get help message by running ```java -jar TDQuery-(version).jar -h``` or simply run ```java -jar TDQuery-(version).jar``` without any arguments.
 
@@ -86,7 +86,7 @@ Then continue with the build process to build an executable JAR file. Then you a
 6. Run it as an executable JAR file. The usage is the same as before.
 
 **NOTICE**: If you changed the table schema in file "table_schema.properties", the test phase may failed when running command ```mvn package``` due to all the test cases were written to test the data in sample table "bryandb.orders".
-So you can change pom.xml in the project root directory to skip the surefire by change the element from ```<skip>false</skip>``` to ```<skip>true</skip>````.
+So you can change pom.xml in the project root directory to skip the surefire by change the element from ```<skip>false</skip>``` to ```<skip>true</skip>```.
 Then you will be able to continue building it even the test failed.
 
 ## Tools and libraries used in the program
