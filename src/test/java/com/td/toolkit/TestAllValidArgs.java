@@ -20,15 +20,15 @@ public class TestAllValidArgs {
     @Rule
     public ExpectedException jobExceptionRule = ExpectedException.none();
 
-    private DBQuery query;
+    private static DBQuery query;
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         query = new DBQuery();
     }
 
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         query.end();
     }
 
@@ -62,7 +62,7 @@ public class TestAllValidArgs {
     @Test
     public void testOneColumnMinPrestoLimitXRow() throws ParseException, JobFailedException, InterruptedException
     {
-        String[] args = {"bryandb","orders","-c","ordernumber","-m","1041778800","-e","presto","-l","9"};
+        String[] args = {"bryandb","orders","-c"," ordernumber ","-m"," 1041778800 ","-e"," presto ","-l"," 9 "};
         Map result = query.run(query.parseArgs(args));
         Map.Entry<Long, String> entry = (Map.Entry<Long, String>) result.entrySet().iterator().next();
         Assert.assertTrue(entry.getKey() > 0);
@@ -80,7 +80,7 @@ public class TestAllValidArgs {
     @Test
     public void testMutipleColumnMinMaxCsv() throws ParseException, JobFailedException, InterruptedException
     {
-        String[] args = {"bryandb","orders","-c","ordernumber,status","-m","1041778800","-M","1117465200","-f","csv"};
+        String[] args = {"bryandb","orders","-c"," ordernumber, status ","-m"," 1041778800 ","-M"," 1117465200 ","-f"," csv "};
         Map result = query.run(query.parseArgs(args));
         Map.Entry<Long, String> entry = (Map.Entry<Long, String>) result.entrySet().iterator().next();
         Assert.assertTrue(entry.getKey() > 0);
@@ -107,7 +107,7 @@ public class TestAllValidArgs {
     @Test
     public void testMultipleColumnTsvLimitXRow() throws ParseException, JobFailedException, InterruptedException
     {
-        String[] args = {"bryandb","orders","-c","ordernumber,status","-f","tsv","-l","9"};
+        String[] args = {"bryandb","orders","-c"," ordernumber , status ","-f"," tsv ","-l"," 9 "};
         Map result = query.run(query.parseArgs(args));
         Map.Entry<Long, String> entry = (Map.Entry<Long, String>) result.entrySet().iterator().next();
         Assert.assertTrue(entry.getKey() > 0);

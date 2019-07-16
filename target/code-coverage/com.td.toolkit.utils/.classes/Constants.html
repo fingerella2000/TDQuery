@@ -1,0 +1,150 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Constants</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.td.toolkit.utils</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Constants (com.td.toolkit.utils)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Constants</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (9/ 15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; * Copyright (c) 2019 Bryan Luo. All rights reserved.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; * This code is free software; you can redistribute it and/or modify it
+<i>5</i>&nbsp; * under the terms of the GNU General Public License, as
+<i>6</i>&nbsp; * published by the Free Software Foundation.
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; */
+<i>9</i>&nbsp;package com.td.toolkit.utils;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;import org.slf4j.Logger;
+<i>12</i>&nbsp;import org.slf4j.LoggerFactory;
+<i>13</i>&nbsp;import java.io.IOException;
+<i>14</i>&nbsp;import java.io.InputStream;
+<i>15</i>&nbsp;import java.util.Properties;
+<i>16</i>&nbsp;
+<b class="fc"><i>17</i>&nbsp;public class Constants {</b>
+<i>18</i>&nbsp;
+<b class="fc"><i>19</i>&nbsp;    final static Logger logger = LoggerFactory.getLogger(Constants.class);</b>
+<i>20</i>&nbsp;    /**
+<i>21</i>&nbsp;     * Help message
+<i>22</i>&nbsp;     */
+<i>23</i>&nbsp;    final public static String MSG_HELP = &quot;TDQuery-(version).jar [Options]... DatabaseName TableName \n Options:\n&quot;;
+<i>24</i>&nbsp;    final public static String MSG_MISSING_REQUIRED_ARGS = &quot;DatabaseName and TableName are required arguments, please specify.\n &quot;;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    final public static String INVALID_ENGINE = &quot;Invalid engine type, only presto and hive are available.&quot;;
+<i>27</i>&nbsp;    final public static String INVALID_FORMAT = &quot;Invalid format type, only tsv and csv are available.&quot;;
+<i>28</i>&nbsp;    final public static String INVALID_TIME_STAMP = &quot;Invalid time, please input the time in Unix Timestamp format.&quot;;
+<i>29</i>&nbsp;    final public static String INVALID_TIME_STAMP_RANGE = &quot;Invalid time range, the minimum time must greater than or equals to maximum time.&quot;;
+<i>30</i>&nbsp;    final public static String INVALID_LIMIT = &quot;Invalid limit, the limit should be a positive number.&quot;;
+<i>31</i>&nbsp;    final public static String INVALID_DATABASE = &quot;Invalid database name.&quot;;
+<i>32</i>&nbsp;    final public static String INVALID_TABLE = &quot;Invalid table name.&quot;;
+<i>33</i>&nbsp;    final public static String RETURNED_COLUMNS_NOT_MATCH_SCHEMA = &quot;Returned columns do not match the schema.&quot;;
+<i>34</i>&nbsp;    final public static String JOB_FINISHED_UNSUCCEED = &quot;Query job finished with an unsuccessful status.&quot;;
+<i>35</i>&nbsp;    final public static String JOB_FINISHED_UNSUCCEED_WITH_NO_RECORD_FOUND = &quot;No records found.&quot;;
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    /**
+<i>39</i>&nbsp;     * Options&#39; values
+<i>40</i>&nbsp;     */
+<i>41</i>&nbsp;    final public static String OUTPUT_FORMAT_TSV = &quot;tsv&quot;; // default
+<i>42</i>&nbsp;    final public static String OUTPUT_FORMAT_CSV = &quot;csv&quot;;
+<i>43</i>&nbsp;    final public static String QUERY_ENGINE_PRESTO = &quot;presto&quot;; // default
+<i>44</i>&nbsp;    final public static String QUERY_ENGINE_HIVE = &quot;hive&quot;;
+<i>45</i>&nbsp;    final public static String OUTPUT_COLUMN_ALL = &quot;*&quot;; // default
+<i>46</i>&nbsp;
+<b class="fc"><i>47</i>&nbsp;    final public static Properties TABLE_COLUMNS = new Properties();</b>
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    public void loadTableColumns() {
+<i>50</i>&nbsp;        // using the property file to define the table schema
+<b class="fc"><i>51</i>&nbsp;        InputStream is = this.getClass().getResourceAsStream(&quot;/table_schema.properties&quot;);</b>
+<b class="fc"><i>52</i>&nbsp;        if (is != null ) {</b>
+<i>53</i>&nbsp;            try {
+<b class="fc"><i>54</i>&nbsp;                TABLE_COLUMNS.load(is);</b>
+<b class="nc"><i>55</i>&nbsp;            } catch (IOException e) {</b>
+<b class="nc"><i>56</i>&nbsp;                logger.debug(&quot;table_schema.properties file is not set correctly&quot;);</b>
+<i>57</i>&nbsp;            } finally {
+<b class="nc"><i>58</i>&nbsp;                try {</b>
+<b class="fc"><i>59</i>&nbsp;                    is.close();</b>
+<b class="nc"><i>60</i>&nbsp;                } catch (IOException e) {</b>
+<b class="nc"><i>61</i>&nbsp;                    logger.error(&quot;table_schema.properties file is not closed correctly.&quot;, e);</b>
+<b class="fc"><i>62</i>&nbsp;                }</b>
+<b class="nc"><i>63</i>&nbsp;            }</b>
+<i>64</i>&nbsp;        }
+<b class="fc"><i>65</i>&nbsp;    }</b>
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-07-16 17:25</div>
+</div>
+</body>
+</html>

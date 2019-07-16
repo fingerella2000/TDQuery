@@ -1,0 +1,549 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: QueryExecutor</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.td.toolkit.utils</a> ]
+</div>
+
+<h1>Coverage Summary for Class: QueryExecutor (com.td.toolkit.utils)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">QueryExecutor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.2%
+  </span>
+  <span class="absValue">
+    (156/ 171)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">QueryExecutor$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/ 5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">QueryExecutor$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/ 5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/ 14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.5%
+  </span>
+  <span class="absValue">
+    (162/ 181)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; * Copyright (c) 2019 Bryan Luo. All rights reserved.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; * This code is free software; you can redistribute it and/or modify it
+<i>5</i>&nbsp; * under the terms of the GNU General Public License, as
+<i>6</i>&nbsp; * published by the Free Software Foundation.
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; */
+<i>9</i>&nbsp;package com.td.toolkit.utils;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+<i>12</i>&nbsp;import com.google.common.base.Function;
+<i>13</i>&nbsp;import com.google.common.base.Optional;
+<i>14</i>&nbsp;import com.google.common.base.Throwables;
+<i>15</i>&nbsp;import com.google.common.io.CharStreams;
+<i>16</i>&nbsp;import com.treasuredata.client.ExponentialBackOff;
+<i>17</i>&nbsp;import com.treasuredata.client.TDClient;
+<i>18</i>&nbsp;import com.treasuredata.client.model.*;
+<i>19</i>&nbsp;import org.slf4j.Logger;
+<i>20</i>&nbsp;import org.slf4j.LoggerFactory;
+<i>21</i>&nbsp;import java.io.IOException;
+<i>22</i>&nbsp;import java.io.InputStream;
+<i>23</i>&nbsp;import java.io.InputStreamReader;
+<i>24</i>&nbsp;import java.util.HashMap;
+<i>25</i>&nbsp;import java.util.List;
+<i>26</i>&nbsp;import java.util.Map;
+<i>27</i>&nbsp;import java.util.Properties;
+<i>28</i>&nbsp;import org.apache.commons.cli.CommandLine;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;/**
+<i>31</i>&nbsp; * Provide methods to run SQL statement.
+<i>32</i>&nbsp; *
+<i>33</i>&nbsp; * @author  Bryan Luo
+<i>34</i>&nbsp; * @version 1.0
+<i>35</i>&nbsp; * @since   1.0
+<i>36</i>&nbsp; *
+<i>37</i>&nbsp; */
+<i>38</i>&nbsp;public class QueryExecutor {
+<i>39</i>&nbsp;
+<b class="fc"><i>40</i>&nbsp;    final static Logger logger = LoggerFactory.getLogger(QueryExecutor.class);</b>
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;    private String sqlSt;
+<i>43</i>&nbsp;    private TDClient client;
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;    public void setCmd(CommandLine cmd) {
+<b class="fc"><i>46</i>&nbsp;        this.cmd = cmd;</b>
+<b class="fc"><i>47</i>&nbsp;    }</b>
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    private CommandLine cmd;
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;    /**
+<i>52</i>&nbsp;     * Initialize the TDClient
+<i>53</i>&nbsp;     */
+<b class="fc"><i>54</i>&nbsp;    public QueryExecutor() {</b>
+<b class="fc"><i>55</i>&nbsp;        Properties properties = new Properties();</b>
+<b class="fc"><i>56</i>&nbsp;        this.client = TDClient.newClient();</b>
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;        // try using the property files where user can define TD API key and endpoint
+<b class="fc"><i>59</i>&nbsp;        InputStream is = this.getClass().getResourceAsStream(&quot;/tdclient.properties&quot;);</b>
+<b class="fc"><i>60</i>&nbsp;        if (is != null ) {</b>
+<i>61</i>&nbsp;            try {
+<b class="fc"><i>62</i>&nbsp;                properties.load(is);</b>
+<b class="fc"><i>63</i>&nbsp;                this.client = TDClient.newBuilder().setProperties(properties).build();</b>
+<b class="fc"><i>64</i>&nbsp;                logger.debug(&quot;API key and endpoint are override by values in the property file.&quot;);</b>
+<b class="nc"><i>65</i>&nbsp;            } catch (IOException e) {</b>
+<b class="nc"><i>66</i>&nbsp;                logger.debug(&quot;tdclient.properties file is not set correctly, still use default td.conf configuration&quot;);</b>
+<i>67</i>&nbsp;            } finally {
+<b class="nc"><i>68</i>&nbsp;                try {</b>
+<b class="fc"><i>69</i>&nbsp;                    is.close();</b>
+<b class="nc"><i>70</i>&nbsp;                } catch (IOException e) {</b>
+<b class="nc"><i>71</i>&nbsp;                    logger.error(&quot;tdclient.properties file is not closed correctly.&quot;, e);</b>
+<b class="fc"><i>72</i>&nbsp;                }</b>
+<b class="nc"><i>73</i>&nbsp;            }</b>
+<i>74</i>&nbsp;        }
+<b class="fc"><i>75</i>&nbsp;    }</b>
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;    /**
+<i>78</i>&nbsp;     * Execute the SQL statement
+<i>79</i>&nbsp;     *
+<i>80</i>&nbsp;     * @return a map with only one entry which key is the row count and value is records in string
+<i>81</i>&nbsp;     * @throws InterruptedException
+<i>82</i>&nbsp;     * @throws JobFailedException
+<i>83</i>&nbsp;     */
+<i>84</i>&nbsp;    public Map runSql() throws InterruptedException, JobFailedException {
+<i>85</i>&nbsp;        // 1. generate the SQL statement using CommandLine object
+<b class="fc"><i>86</i>&nbsp;        prepareSql();</b>
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;        // 2. validate if the given database name and table name is valid
+<b class="fc"><i>89</i>&nbsp;        validateDbAndTable();</b>
+<i>90</i>&nbsp;
+<i>91</i>&nbsp;        // 3. run the TD job
+<b class="fc"><i>92</i>&nbsp;        String jobId = runTDJob();</b>
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;        // 4. throw exception if no zero row returned
+<b class="fc"><i>95</i>&nbsp;        long rows_returned = client.jobInfo(jobId).getNumRecords();</b>
+<b class="fc"><i>96</i>&nbsp;        if(rows_returned == 0) {</b>
+<b class="fc"><i>97</i>&nbsp;            throw new JobFailedException(Constants.JOB_FINISHED_UNSUCCEED_WITH_NO_RECORD_FOUND);</b>
+<i>98</i>&nbsp;        }
+<i>99</i>&nbsp;
+<i>100</i>&nbsp;        // 5. validate if the returned columns in compliance with pre-defined table schema
+<b class="fc"><i>101</i>&nbsp;        String returned_columns = validateReturnColumns(jobId);</b>
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;        // 6. process the result with the particular format
+<b class="fc"><i>104</i>&nbsp;        String result = processJobResult(jobId);</b>
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;        // 7. return the result as a map which key is row count and value is result content
+<b class="fc"><i>107</i>&nbsp;        Map&lt;Long, String&gt; result_map = new HashMap&lt;Long, String&gt;();</b>
+<b class="fc"><i>108</i>&nbsp;        result_map.put(new Long(rows_returned), returned_columns + &quot;\n&quot; + result);</b>
+<b class="fc"><i>109</i>&nbsp;        return result_map;</b>
+<i>110</i>&nbsp;    }
+<i>111</i>&nbsp;
+<i>112</i>&nbsp;    /**
+<i>113</i>&nbsp;     * Produce an valid query statement
+<i>114</i>&nbsp;     *
+<i>115</i>&nbsp;     */
+<i>116</i>&nbsp;    private void prepareSql() {
+<i>117</i>&nbsp;        // options&#39; default values
+<b class="fc"><i>118</i>&nbsp;        String columns_value = &quot;*&quot;;</b>
+<b class="fc"><i>119</i>&nbsp;        String limit_value = &quot;&quot;;</b>
+<b class="fc"><i>120</i>&nbsp;        String min_value = &quot;&quot;;</b>
+<b class="fc"><i>121</i>&nbsp;        String max_value = &quot;&quot;;</b>
+<i>122</i>&nbsp;
+<b class="fc"><i>123</i>&nbsp;        List&lt;String&gt; parsed_args = cmd.getArgList();</b>
+<b class="fc"><i>124</i>&nbsp;        String table_name = parsed_args.get(1);</b>
+<i>125</i>&nbsp;
+<i>126</i>&nbsp;        // check column option
+<b class="fc"><i>127</i>&nbsp;        if (cmd.hasOption(&#39;c&#39;) || cmd.hasOption(&quot;column&quot;)) {</b>
+<b class="fc"><i>128</i>&nbsp;            columns_value = cmd.getOptionValue(&quot;c&quot;).toLowerCase().trim();</b>
+<b class="fc"><i>129</i>&nbsp;            logger.debug(&quot;columns: {}&quot;, columns_value);</b>
+<i>130</i>&nbsp;        }
+<i>131</i>&nbsp;
+<b class="fc"><i>132</i>&nbsp;        this.sqlSt = &quot;select &quot; + columns_value + &quot; from &quot; + table_name + &quot; where 1=1 &quot;;</b>
+<i>133</i>&nbsp;
+<i>134</i>&nbsp;        // check min option
+<b class="fc"><i>135</i>&nbsp;        if (cmd.hasOption(&#39;m&#39;) || cmd.hasOption(&quot;min&quot;)) {</b>
+<b class="fc"><i>136</i>&nbsp;            min_value = cmd.getOptionValue(&quot;m&quot;).trim();</b>
+<b class="fc"><i>137</i>&nbsp;            logger.debug(&quot;min: {}&quot;, min_value);</b>
+<b class="fc"><i>138</i>&nbsp;            if(!min_value.toLowerCase().equals(&quot;null&quot;)) {</b>
+<b class="fc"><i>139</i>&nbsp;                this.sqlSt += &quot; and time &gt;= &quot; + min_value;</b>
+<i>140</i>&nbsp;            }
+<i>141</i>&nbsp;        }
+<i>142</i>&nbsp;
+<i>143</i>&nbsp;        // check max option
+<b class="fc"><i>144</i>&nbsp;        if (cmd.hasOption(&#39;M&#39;) || cmd.hasOption(&quot;MAX&quot;)) {</b>
+<b class="fc"><i>145</i>&nbsp;            max_value = cmd.getOptionValue(&quot;M&quot;).trim();</b>
+<b class="fc"><i>146</i>&nbsp;            logger.debug(&quot;max: {}&quot;, max_value);</b>
+<b class="fc"><i>147</i>&nbsp;            if(!max_value.toLowerCase().equals(&quot;null&quot;)) {</b>
+<b class="fc"><i>148</i>&nbsp;                this.sqlSt += &quot; and time &lt;= &quot; + max_value;</b>
+<i>149</i>&nbsp;            }
+<i>150</i>&nbsp;        }
+<i>151</i>&nbsp;
+<i>152</i>&nbsp;        // check limit option
+<b class="fc"><i>153</i>&nbsp;        if (cmd.hasOption(&#39;l&#39;) || cmd.hasOption(&quot;limit&quot;)) {</b>
+<b class="fc"><i>154</i>&nbsp;            limit_value = cmd.getOptionValue(&quot;l&quot;).trim();</b>
+<b class="fc"><i>155</i>&nbsp;            logger.debug(&quot;limit: {}&quot;, limit_value);</b>
+<b class="fc"><i>156</i>&nbsp;            this.sqlSt += &quot; limit &quot; + limit_value;</b>
+<i>157</i>&nbsp;        }
+<b class="fc"><i>158</i>&nbsp;        logger.debug(&quot;sql statement: {}&quot;, this.sqlSt);</b>
+<b class="fc"><i>159</i>&nbsp;    }</b>
+<i>160</i>&nbsp;
+<i>161</i>&nbsp;    /**
+<i>162</i>&nbsp;     * Process the result with the particular format
+<i>163</i>&nbsp;     * @param jobId
+<i>164</i>&nbsp;     * @return
+<i>165</i>&nbsp;     */
+<i>166</i>&nbsp;    private String processJobResult(String jobId) {
+<b class="fc"><i>167</i>&nbsp;        String result = &quot;&quot;;</b>
+<b class="fc"><i>168</i>&nbsp;        String format_value = Constants.OUTPUT_FORMAT_TSV;</b>
+<i>169</i>&nbsp;
+<i>170</i>&nbsp;        // get format option
+<b class="fc"><i>171</i>&nbsp;        if (cmd.hasOption(&#39;f&#39;) || cmd.hasOption(&quot;format&quot;)) {</b>
+<b class="fc"><i>172</i>&nbsp;            format_value = cmd.getOptionValue(&quot;f&quot;).trim();</b>
+<i>173</i>&nbsp;        }
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;        // output query result in a specific format according to the format type
+<b class="fc"><i>176</i>&nbsp;        if (format_value.toLowerCase().equals(Constants.OUTPUT_FORMAT_TSV)) {</b>
+<i>177</i>&nbsp;            // Read the job results in TSV
+<b class="fc"><i>178</i>&nbsp;            result = client.jobResult(jobId, TDResultFormat.TSV, new Function&lt;InputStream, String&gt;() {</b>
+<i>179</i>&nbsp;                @Override
+<i>180</i>&nbsp;                public String apply(InputStream input) {
+<i>181</i>&nbsp;                    try {
+<b class="fc"><i>182</i>&nbsp;                        String result = CharStreams.toString(new InputStreamReader(input));</b>
+<b class="fc"><i>183</i>&nbsp;                        return result;</b>
+<b class="nc"><i>184</i>&nbsp;                    } catch (IOException e) {</b>
+<b class="nc"><i>185</i>&nbsp;                        throw Throwables.propagate(e);</b>
+<i>186</i>&nbsp;                    }
+<i>187</i>&nbsp;                }
+<i>188</i>&nbsp;            });
+<b class="fc"><i>189</i>&nbsp;        } else if (format_value.toLowerCase().equals(Constants.OUTPUT_FORMAT_CSV)) {</b>
+<i>190</i>&nbsp;            // Read the job results in CSV
+<b class="fc"><i>191</i>&nbsp;            result = client.jobResult(jobId, TDResultFormat.CSV, new Function&lt;InputStream, String&gt;() {</b>
+<i>192</i>&nbsp;                @Override
+<i>193</i>&nbsp;                public String apply(InputStream input) {
+<i>194</i>&nbsp;                    try {
+<b class="fc"><i>195</i>&nbsp;                        String result = CharStreams.toString(new InputStreamReader(input));</b>
+<b class="fc"><i>196</i>&nbsp;                        return result;</b>
+<b class="nc"><i>197</i>&nbsp;                    } catch (IOException e) {</b>
+<b class="nc"><i>198</i>&nbsp;                        throw Throwables.propagate(e);</b>
+<i>199</i>&nbsp;                    }
+<i>200</i>&nbsp;                }
+<i>201</i>&nbsp;            });
+<i>202</i>&nbsp;        }
+<b class="fc"><i>203</i>&nbsp;        return result;</b>
+<i>204</i>&nbsp;    }
+<i>205</i>&nbsp;
+<i>206</i>&nbsp;    /**
+<i>207</i>&nbsp;     * Validate if the returned columns in compliance with pre-defined table schema
+<i>208</i>&nbsp;     * @param jobId
+<i>209</i>&nbsp;     * @return column name using the same format as the result content
+<i>210</i>&nbsp;     * @throws JobFailedException
+<i>211</i>&nbsp;     */
+<i>212</i>&nbsp;    private String validateReturnColumns(String jobId) throws JobFailedException{
+<i>213</i>&nbsp;
+<b class="fc"><i>214</i>&nbsp;        String format_value = Constants.OUTPUT_FORMAT_TSV;</b>
+<i>215</i>&nbsp;
+<i>216</i>&nbsp;        // get format option
+<b class="fc"><i>217</i>&nbsp;        if (cmd.hasOption(&#39;f&#39;) || cmd.hasOption(&quot;format&quot;)) {</b>
+<b class="fc"><i>218</i>&nbsp;            format_value = cmd.getOptionValue(&quot;f&quot;).trim();</b>
+<i>219</i>&nbsp;        }
+<i>220</i>&nbsp;
+<i>221</i>&nbsp;        // get engine type from arguments
+<b class="fc"><i>222</i>&nbsp;        String engine_value = Constants.QUERY_ENGINE_PRESTO;</b>
+<b class="fc"><i>223</i>&nbsp;        if (cmd.hasOption(&#39;e&#39;) || cmd.hasOption(&quot;engine&quot;)) {</b>
+<b class="fc"><i>224</i>&nbsp;            engine_value = cmd.getOptionValue(&quot;e&quot;).trim();</b>
+<i>225</i>&nbsp;        }
+<i>226</i>&nbsp;
+<b class="fc"><i>227</i>&nbsp;        String columns_value = Constants.OUTPUT_COLUMN_ALL;</b>
+<i>228</i>&nbsp;
+<i>229</i>&nbsp;        // get column option
+<b class="fc"><i>230</i>&nbsp;        if (cmd.hasOption(&#39;c&#39;) || cmd.hasOption(&quot;column&quot;)) {</b>
+<b class="fc"><i>231</i>&nbsp;            columns_value = cmd.getOptionValue(&quot;c&quot;).toLowerCase().trim();</b>
+<i>232</i>&nbsp;        }
+<i>233</i>&nbsp;
+<b class="fc"><i>234</i>&nbsp;        String returned_columns = &quot;&quot;;</b>
+<b class="fc"><i>235</i>&nbsp;        Optional&lt;String&gt; schema_returned = client.jobInfo(jobId).getResultSchema();</b>
+<i>236</i>&nbsp;
+<b class="fc"><i>237</i>&nbsp;        if(schema_returned.isPresent()) {</b>
+<b class="fc"><i>238</i>&nbsp;            String schema = &quot;{\&quot;columns\&quot;:&quot; + schema_returned.get() + &quot;}&quot;;</b>
+<b class="fc"><i>239</i>&nbsp;            ObjectMapper mapper = new ObjectMapper();</b>
+<i>240</i>&nbsp;            TDSchema schema_obj;
+<i>241</i>&nbsp;            try {
+<b class="fc"><i>242</i>&nbsp;                schema_obj = mapper.readValue(schema , TDSchema.class);</b>
+<i>243</i>&nbsp;            }
+<b class="nc"><i>244</i>&nbsp;            catch (IOException e) {</b>
+<b class="nc"><i>245</i>&nbsp;                throw new JobFailedException(&quot;Result schema is not in correct JSON format.&quot;, e);</b>
+<b class="fc"><i>246</i>&nbsp;            }</b>
+<i>247</i>&nbsp;
+<i>248</i>&nbsp;            // check columns are returned
+<b class="fc"><i>249</i>&nbsp;            boolean is_col_name_valid = false;</b>
+<i>250</i>&nbsp;
+<b class="fc"><i>251</i>&nbsp;            if (columns_value.equals(&quot;*&quot;)){ // return all columns</b>
+<i>252</i>&nbsp;                // 1. validate the column number is correct
+<b class="fc"><i>253</i>&nbsp;                if (engine_value.equals(Constants.QUERY_ENGINE_PRESTO)) {</b>
+<b class="fc"><i>254</i>&nbsp;                    if (schema_obj.getColumns().length != Constants.TABLE_COLUMNS.size()) {</b>
+<b class="nc"><i>255</i>&nbsp;                        throw new JobFailedException(Constants.RETURNED_COLUMNS_NOT_MATCH_SCHEMA);</b>
+<i>256</i>&nbsp;                    }
+<b class="fc"><i>257</i>&nbsp;                }else if (engine_value.equals(Constants.QUERY_ENGINE_HIVE)){</b>
+<i>258</i>&nbsp;                    // engine hive will return another virtual column named &quot;v&quot; with &quot;map&quot; column type, I guess it was used in map reduce
+<b class="fc"><i>259</i>&nbsp;                    if (schema_obj.getColumns().length-1 != Constants.TABLE_COLUMNS.size()) {</b>
+<b class="nc"><i>260</i>&nbsp;                        throw new JobFailedException(Constants.RETURNED_COLUMNS_NOT_MATCH_SCHEMA);</b>
+<i>261</i>&nbsp;                    }
+<i>262</i>&nbsp;                }
+<i>263</i>&nbsp;                // 2. validate the column name is correct
+<b class="fc"><i>264</i>&nbsp;                boolean index_zero = true;</b>
+<b class="fc"><i>265</i>&nbsp;                for (String[] col : schema_obj.getColumns()){</b>
+<b class="fc"><i>266</i>&nbsp;                    if (format_value.toLowerCase().equals(Constants.OUTPUT_FORMAT_TSV)) {</b>
+<b class="fc"><i>267</i>&nbsp;                        if(index_zero) {</b>
+<b class="fc"><i>268</i>&nbsp;                            returned_columns = col[0];</b>
+<i>269</i>&nbsp;                        }else {
+<b class="fc"><i>270</i>&nbsp;                            returned_columns +=  &quot;    &quot; + col[0];</b>
+<i>271</i>&nbsp;                        }
+<b class="fc"><i>272</i>&nbsp;                    }else if (format_value.toLowerCase().equals(Constants.OUTPUT_FORMAT_CSV)) {</b>
+<b class="fc"><i>273</i>&nbsp;                        if(index_zero) {</b>
+<b class="fc"><i>274</i>&nbsp;                            returned_columns = col[0];</b>
+<i>275</i>&nbsp;                        }else {
+<b class="fc"><i>276</i>&nbsp;                            returned_columns +=  &quot;,&quot; + col[0];</b>
+<i>277</i>&nbsp;                        }
+<i>278</i>&nbsp;                    }
+<i>279</i>&nbsp;
+<b class="fc"><i>280</i>&nbsp;                    if (Constants.TABLE_COLUMNS.containsKey(col[0])){</b>
+<b class="fc"><i>281</i>&nbsp;                        is_col_name_valid = true;</b>
+<i>282</i>&nbsp;                    }else {
+<b class="fc"><i>283</i>&nbsp;                        is_col_name_valid = false;</b>
+<i>284</i>&nbsp;                    }
+<i>285</i>&nbsp;
+<i>286</i>&nbsp;                    // engine hive will return another virtual column named &quot;v&quot; with &quot;map&quot; column type, I guess it was used in map reduce
+<b class="fc"><i>287</i>&nbsp;                    if (engine_value.equals(Constants.QUERY_ENGINE_HIVE)) {</b>
+<b class="fc"><i>288</i>&nbsp;                        if (col[0].toLowerCase().equals(&quot;v&quot;)) {</b>
+<b class="fc"><i>289</i>&nbsp;                            is_col_name_valid = false;</b>
+<i>290</i>&nbsp;                        }
+<i>291</i>&nbsp;                    }
+<b class="fc"><i>292</i>&nbsp;                    index_zero = false;</b>
+<i>293</i>&nbsp;                }
+<b class="fc"><i>294</i>&nbsp;                if(!is_col_name_valid) {</b>
+<b class="nc"><i>295</i>&nbsp;                    throw new JobFailedException(Constants.RETURNED_COLUMNS_NOT_MATCH_SCHEMA);</b>
+<i>296</i>&nbsp;                }
+<b class="fc"><i>297</i>&nbsp;            } else { // return columns specified in command line</b>
+<b class="fc"><i>298</i>&nbsp;                String[] cols = columns_value.split(&quot;,&quot;);</b>
+<i>299</i>&nbsp;                // 1. validate the column number is correct
+<b class="fc"><i>300</i>&nbsp;                if (schema_obj.getColumns().length != cols.length) {</b>
+<b class="nc"><i>301</i>&nbsp;                    throw new JobFailedException(Constants.RETURNED_COLUMNS_NOT_MATCH_SCHEMA);</b>
+<i>302</i>&nbsp;                }
+<i>303</i>&nbsp;                // 2. validate the column name is correct
+<b class="fc"><i>304</i>&nbsp;                boolean index_zero = true;</b>
+<b class="fc"><i>305</i>&nbsp;                for(String col : cols) {</b>
+<b class="fc"><i>306</i>&nbsp;                    col = col.trim();</b>
+<b class="fc"><i>307</i>&nbsp;                    if (format_value.toLowerCase().equals(Constants.OUTPUT_FORMAT_TSV)) {</b>
+<b class="fc"><i>308</i>&nbsp;                        if(index_zero) {</b>
+<b class="fc"><i>309</i>&nbsp;                            returned_columns = col;</b>
+<i>310</i>&nbsp;                        }else {
+<b class="fc"><i>311</i>&nbsp;                            returned_columns +=  &quot;    &quot; + col;</b>
+<i>312</i>&nbsp;                        }
+<b class="fc"><i>313</i>&nbsp;                    }else if (format_value.toLowerCase().equals(Constants.OUTPUT_FORMAT_CSV)) {</b>
+<b class="fc"><i>314</i>&nbsp;                        if(index_zero) {</b>
+<b class="fc"><i>315</i>&nbsp;                            returned_columns = col;</b>
+<i>316</i>&nbsp;                        }else {
+<b class="fc"><i>317</i>&nbsp;                            returned_columns +=  &quot;,&quot; + col;</b>
+<i>318</i>&nbsp;                        }
+<i>319</i>&nbsp;                    }
+<b class="fc"><i>320</i>&nbsp;                    if (Constants.TABLE_COLUMNS.containsKey(col)){</b>
+<b class="fc"><i>321</i>&nbsp;                        is_col_name_valid = true;</b>
+<i>322</i>&nbsp;                    }else {
+<b class="nc"><i>323</i>&nbsp;                        is_col_name_valid = false;</b>
+<i>324</i>&nbsp;                    }
+<b class="fc"><i>325</i>&nbsp;                    index_zero = false;</b>
+<i>326</i>&nbsp;                }
+<b class="fc"><i>327</i>&nbsp;                if(!is_col_name_valid) {</b>
+<b class="nc"><i>328</i>&nbsp;                    throw new JobFailedException(Constants.RETURNED_COLUMNS_NOT_MATCH_SCHEMA);</b>
+<i>329</i>&nbsp;                }
+<i>330</i>&nbsp;            }
+<b class="fc"><i>331</i>&nbsp;        }else {</b>
+<b class="nc"><i>332</i>&nbsp;            throw new JobFailedException(&quot;Result schema is not presented.&quot;);</b>
+<i>333</i>&nbsp;        }
+<b class="fc"><i>334</i>&nbsp;        return returned_columns;</b>
+<i>335</i>&nbsp;    }
+<i>336</i>&nbsp;
+<i>337</i>&nbsp;    /**
+<i>338</i>&nbsp;     * Run Treasure Data Job
+<i>339</i>&nbsp;     *
+<i>340</i>&nbsp;     * @return job id after job finished
+<i>341</i>&nbsp;     * @throws JobFailedException if job failed with any reason
+<i>342</i>&nbsp;     * @throws InterruptedException if job was interrupted while running
+<i>343</i>&nbsp;     */
+<i>344</i>&nbsp;    private String runTDJob() throws JobFailedException, InterruptedException{
+<i>345</i>&nbsp;
+<b class="fc"><i>346</i>&nbsp;        List&lt;String&gt; parsed_args = cmd.getArgList();</b>
+<i>347</i>&nbsp;
+<b class="fc"><i>348</i>&nbsp;        String db_name = parsed_args.get(0);</b>
+<i>349</i>&nbsp;
+<b class="fc"><i>350</i>&nbsp;        String engine_value = Constants.QUERY_ENGINE_PRESTO;</b>
+<i>351</i>&nbsp;
+<i>352</i>&nbsp;        // get engine option
+<b class="fc"><i>353</i>&nbsp;        if (cmd.hasOption(&#39;e&#39;) || cmd.hasOption(&quot;engine&quot;)) {</b>
+<b class="fc"><i>354</i>&nbsp;            engine_value = cmd.getOptionValue(&quot;e&quot;).trim();</b>
+<i>355</i>&nbsp;        }
+<i>356</i>&nbsp;
+<b class="fc"><i>357</i>&nbsp;        String jobId = &quot;&quot;;</b>
+<i>358</i>&nbsp;        // initiate a job according to the engine type
+<b class="fc"><i>359</i>&nbsp;        if (engine_value.toLowerCase().equals(Constants.QUERY_ENGINE_PRESTO)) {</b>
+<i>360</i>&nbsp;            // Submit a new Presto query
+<b class="fc"><i>361</i>&nbsp;            jobId = client.submit(TDJobRequest.newPrestoQuery(db_name, this.sqlSt));</b>
+<i>362</i>&nbsp;
+<b class="fc"><i>363</i>&nbsp;        } else if (engine_value.toLowerCase().equals(Constants.QUERY_ENGINE_HIVE)) {</b>
+<i>364</i>&nbsp;            // Submit a new Presto query
+<b class="fc"><i>365</i>&nbsp;            jobId = client.submit(TDJobRequest.newHiveQuery(db_name, this.sqlSt));</b>
+<i>366</i>&nbsp;        }
+<i>367</i>&nbsp;
+<i>368</i>&nbsp;
+<i>369</i>&nbsp;        // Wait until the query finishes
+<b class="fc"><i>370</i>&nbsp;        ExponentialBackOff backOff = new ExponentialBackOff();</b>
+<b class="fc"><i>371</i>&nbsp;        TDJobSummary job = client.jobStatus(jobId);</b>
+<i>372</i>&nbsp;
+<b class="fc"><i>373</i>&nbsp;        while (!job.getStatus().isFinished()) {</b>
+<b class="fc"><i>374</i>&nbsp;            Thread.sleep(backOff.nextWaitTimeMillis());</b>
+<b class="fc"><i>375</i>&nbsp;            job = client.jobStatus(jobId);</b>
+<i>376</i>&nbsp;        }
+<i>377</i>&nbsp;
+<b class="fc"><i>378</i>&nbsp;        if (job.getStatus() != TDJob.Status.SUCCESS) {</b>
+<b class="fc"><i>379</i>&nbsp;            throw new JobFailedException(Constants.JOB_FINISHED_UNSUCCEED + job.getStatus());</b>
+<i>380</i>&nbsp;        }
+<i>381</i>&nbsp;
+<b class="fc"><i>382</i>&nbsp;        return jobId;</b>
+<i>383</i>&nbsp;    }
+<i>384</i>&nbsp;
+<i>385</i>&nbsp;    /**
+<i>386</i>&nbsp;     * Validate if the dabase name and table name available in Treasure Data
+<i>387</i>&nbsp;     * @throws JobFailedException if dabase name or table name is invalid
+<i>388</i>&nbsp;     */
+<i>389</i>&nbsp;    private void validateDbAndTable() throws JobFailedException{
+<b class="fc"><i>390</i>&nbsp;        List&lt;String&gt; parsed_args = cmd.getArgList();</b>
+<i>391</i>&nbsp;
+<b class="fc"><i>392</i>&nbsp;        String db_name = parsed_args.get(0).trim();</b>
+<b class="fc"><i>393</i>&nbsp;        String table_name = parsed_args.get(1).trim();</b>
+<i>394</i>&nbsp;
+<b class="fc"><i>395</i>&nbsp;        List&lt;String&gt; db_names = client.listDatabaseNames();</b>
+<i>396</i>&nbsp;        // databaseName is not valid
+<b class="fc"><i>397</i>&nbsp;        if (!db_names.contains(db_name)) {</b>
+<b class="fc"><i>398</i>&nbsp;            throw new JobFailedException(Constants.INVALID_DATABASE + &quot; Available database are: &quot; + db_names);</b>
+<i>399</i>&nbsp;        }
+<b class="fc"><i>400</i>&nbsp;        List&lt;TDTable&gt; table_names = client.listTables(db_name);</b>
+<b class="fc"><i>401</i>&nbsp;        boolean is_table_name_valid = false;</b>
+<i>402</i>&nbsp;        // tableName is not valid
+<b class="fc"><i>403</i>&nbsp;        for(TDTable table : table_names) {</b>
+<b class="fc"><i>404</i>&nbsp;            if (table.getName().equals(table_name)) {</b>
+<b class="fc"><i>405</i>&nbsp;                is_table_name_valid = true;</b>
+<i>406</i>&nbsp;            }
+<b class="fc"><i>407</i>&nbsp;        }</b>
+<b class="fc"><i>408</i>&nbsp;        if (!is_table_name_valid) {</b>
+<b class="fc"><i>409</i>&nbsp;            throw new JobFailedException(Constants.INVALID_TABLE + &quot; Available tables are: &quot; + table_names);</b>
+<i>410</i>&nbsp;        }
+<b class="fc"><i>411</i>&nbsp;    }</b>
+<i>412</i>&nbsp;
+<i>413</i>&nbsp;    /**
+<i>414</i>&nbsp;     * Closed the connection to Treasure Data Server
+<i>415</i>&nbsp;     */
+<i>416</i>&nbsp;    public void terminate() {
+<b class="fc"><i>417</i>&nbsp;        if(client != null) {</b>
+<b class="fc"><i>418</i>&nbsp;            client.close();</b>
+<i>419</i>&nbsp;        }
+<b class="fc"><i>420</i>&nbsp;    }</b>
+<i>421</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-07-16 17:25</div>
+</div>
+</body>
+</html>

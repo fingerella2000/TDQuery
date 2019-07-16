@@ -20,15 +20,15 @@ public class TestReturnedData {
     @Rule
     public ExpectedException jobExceptionRule = ExpectedException.none();
 
-    private DBQuery query;
+    private static DBQuery query;
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         query = new DBQuery();
     }
 
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         query.end();
     }
 

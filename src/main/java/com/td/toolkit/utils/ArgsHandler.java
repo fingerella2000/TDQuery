@@ -92,7 +92,7 @@ public class ArgsHandler {
 
         // check engine option
         if (cmd.hasOption('e') || cmd.hasOption("engine")) {
-            String engine = cmd.getOptionValue("e");
+            String engine = cmd.getOptionValue("e").trim();
             logger.debug("engine: {}", engine);
             if (!engine.toLowerCase().equals(Constants.QUERY_ENGINE_PRESTO) && !engine.toLowerCase().equals(Constants.QUERY_ENGINE_HIVE)) {
                 throw new ParseException(Constants.INVALID_ENGINE);
@@ -100,7 +100,7 @@ public class ArgsHandler {
         }
         // check format option
         if (cmd.hasOption('f') || cmd.hasOption("format")) {
-            String format = cmd.getOptionValue("f");
+            String format = cmd.getOptionValue("f").trim();
             logger.debug("format: {}", format);
             if (!format.toLowerCase().equals(Constants.OUTPUT_FORMAT_TSV) && !format.toLowerCase().equals(Constants.OUTPUT_FORMAT_CSV)) {
                 throw new ParseException(Constants.INVALID_FORMAT);
@@ -114,7 +114,7 @@ public class ArgsHandler {
 
         // check min option
         if (cmd.hasOption('m') || cmd.hasOption("min")) {
-            min_value_str = cmd.getOptionValue("m");
+            min_value_str = cmd.getOptionValue("m").trim();
             logger.debug("min: {}", min_value_str);
             try {
                 if(!min_value_str.toLowerCase().equals("null")) {
@@ -127,7 +127,7 @@ public class ArgsHandler {
 
         // check max option
         if (cmd.hasOption('M') || cmd.hasOption("MAX")) {
-            max_value_str = cmd.getOptionValue("M");
+            max_value_str = cmd.getOptionValue("M").trim();
             logger.debug("max: {}", max_value_str);
             try {
                 if (!max_value_str.toLowerCase().equals("null")) {
@@ -150,7 +150,7 @@ public class ArgsHandler {
 
         // check limit option
         if (cmd.hasOption('l') || cmd.hasOption("limit")) {
-            limit_value_str = cmd.getOptionValue("l");
+            limit_value_str = cmd.getOptionValue("l").trim();
             logger.debug("limit: {}", limit_value_str);
             try {
                 limit_value_l = Long.valueOf(limit_value_str);

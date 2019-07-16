@@ -133,7 +133,7 @@ public class QueryExecutor {
 
         // check min option
         if (cmd.hasOption('m') || cmd.hasOption("min")) {
-            min_value = cmd.getOptionValue("m");
+            min_value = cmd.getOptionValue("m").trim();
             logger.debug("min: {}", min_value);
             if(!min_value.toLowerCase().equals("null")) {
                 this.sqlSt += " and time >= " + min_value;
@@ -142,7 +142,7 @@ public class QueryExecutor {
 
         // check max option
         if (cmd.hasOption('M') || cmd.hasOption("MAX")) {
-            max_value = cmd.getOptionValue("M");
+            max_value = cmd.getOptionValue("M").trim();
             logger.debug("max: {}", max_value);
             if(!max_value.toLowerCase().equals("null")) {
                 this.sqlSt += " and time <= " + max_value;
@@ -151,7 +151,7 @@ public class QueryExecutor {
 
         // check limit option
         if (cmd.hasOption('l') || cmd.hasOption("limit")) {
-            limit_value = cmd.getOptionValue("l");
+            limit_value = cmd.getOptionValue("l").trim();
             logger.debug("limit: {}", limit_value);
             this.sqlSt += " limit " + limit_value;
         }
@@ -169,7 +169,7 @@ public class QueryExecutor {
 
         // get format option
         if (cmd.hasOption('f') || cmd.hasOption("format")) {
-            format_value = cmd.getOptionValue("f");
+            format_value = cmd.getOptionValue("f").trim();
         }
 
         // output query result in a specific format according to the format type
@@ -215,13 +215,13 @@ public class QueryExecutor {
 
         // get format option
         if (cmd.hasOption('f') || cmd.hasOption("format")) {
-            format_value = cmd.getOptionValue("f");
+            format_value = cmd.getOptionValue("f").trim();
         }
 
         // get engine type from arguments
         String engine_value = Constants.QUERY_ENGINE_PRESTO;
         if (cmd.hasOption('e') || cmd.hasOption("engine")) {
-            engine_value = cmd.getOptionValue("e");
+            engine_value = cmd.getOptionValue("e").trim();
         }
 
         String columns_value = Constants.OUTPUT_COLUMN_ALL;
@@ -303,7 +303,7 @@ public class QueryExecutor {
                 // 2. validate the column name is correct
                 boolean index_zero = true;
                 for(String col : cols) {
-                    col.trim();
+                    col = col.trim();
                     if (format_value.toLowerCase().equals(Constants.OUTPUT_FORMAT_TSV)) {
                         if(index_zero) {
                             returned_columns = col;
@@ -351,7 +351,7 @@ public class QueryExecutor {
 
         // get engine option
         if (cmd.hasOption('e') || cmd.hasOption("engine")) {
-            engine_value = cmd.getOptionValue("e");
+            engine_value = cmd.getOptionValue("e").trim();
         }
 
         String jobId = "";
@@ -389,8 +389,8 @@ public class QueryExecutor {
     private void validateDbAndTable() throws JobFailedException{
         List<String> parsed_args = cmd.getArgList();
 
-        String db_name = parsed_args.get(0);
-        String table_name = parsed_args.get(1);
+        String db_name = parsed_args.get(0).trim();
+        String table_name = parsed_args.get(1).trim();
 
         List<String> db_names = client.listDatabaseNames();
         // databaseName is not valid

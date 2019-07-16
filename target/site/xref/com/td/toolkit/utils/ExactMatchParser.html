@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>ExactMatchParser xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../stylesheet.css" />
+</head>
+<body>
+<div id="overview"><a href="../../../../../apidocs/com/td/toolkit/utils/ExactMatchParser.html">View Javadoc</a></div><pre>
+<a class="jxr_linenumber" name="L1" href="#L1">1</a>   <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L2" href="#L2">2</a>   <em class="jxr_javadoccomment"> * Copyright (c) 2019 Bryan Luo. All rights reserved.</em>
+<a class="jxr_linenumber" name="L3" href="#L3">3</a>   <em class="jxr_javadoccomment"> *</em>
+<a class="jxr_linenumber" name="L4" href="#L4">4</a>   <em class="jxr_javadoccomment"> * This code is free software; you can redistribute it and/or modify it</em>
+<a class="jxr_linenumber" name="L5" href="#L5">5</a>   <em class="jxr_javadoccomment"> * under the terms of the GNU General Public License, as</em>
+<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <em class="jxr_javadoccomment"> * published by the Free Software Foundation.</em>
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_javadoccomment"> *</em>
+<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_javadoccomment"> */</em>
+<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <strong class="jxr_keyword">package</strong> com.td.toolkit.utils;
+<a class="jxr_linenumber" name="L10" href="#L10">10</a>  
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>  
+<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <strong class="jxr_keyword">import</strong> java.util.ArrayList;
+<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <strong class="jxr_keyword">import</strong> java.util.List;
+<a class="jxr_linenumber" name="L14" href="#L14">14</a>  <strong class="jxr_keyword">import</strong> org.apache.commons.cli.CommandLine;
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <strong class="jxr_keyword">import</strong> org.apache.commons.cli.DefaultParser;
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> org.apache.commons.cli.Options;
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">import</strong> org.apache.commons.cli.ParseException;
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> org.slf4j.Logger;
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> org.slf4j.LoggerFactory;
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>  
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <em class="jxr_javadoccomment"> * An extended parser limited the following matching mechanisms the DefaultParser provided:</em>
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <em class="jxr_javadoccomment"> *</em>
+<a class="jxr_linenumber" name="L24" href="#L24">24</a>  <em class="jxr_javadoccomment"> * 1. Treat option as invalid if it partially match the predefined options.</em>
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <em class="jxr_javadoccomment"> *</em>
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <em class="jxr_javadoccomment"> * For example: -columnx option may match the short option -c and taking "olumnx" as option value.</em>
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <em class="jxr_javadoccomment"> *</em>
+<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <em class="jxr_javadoccomment"> * 2. Treat short option as invalid if it matches the long predefined options.</em>
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <em class="jxr_javadoccomment"> *</em>
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <em class="jxr_javadoccomment"> * For example: -column option may match the long option --column.</em>
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <em class="jxr_javadoccomment"> *</em>
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <em class="jxr_javadoccomment"> * @author  Bryan Luo</em>
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <em class="jxr_javadoccomment"> * @version 1.0</em>
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <em class="jxr_javadoccomment"> * @since   1.0</em>
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <em class="jxr_javadoccomment"> *</em>
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <em class="jxr_javadoccomment"> */</em>
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a name="ExactMatchParser" href="../../../../com/td/toolkit/utils/ExactMatchParser.html#ExactMatchParser">ExactMatchParser</a> <strong class="jxr_keyword">extends</strong> DefaultParser {
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>  
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>      <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">static</strong> Logger logger = LoggerFactory.getLogger(ExactMatchParser.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>  
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>      <strong class="jxr_keyword">private</strong> String stripLeadingHyphens(String str) {
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>          <strong class="jxr_keyword">if</strong> (str == <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>              <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>          } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (str.startsWith(<span class="jxr_string">"--"</span>)) {
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>              <strong class="jxr_keyword">return</strong> str.substring(2, str.length());
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>          } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>              <strong class="jxr_keyword">return</strong> str.startsWith(<span class="jxr_string">"-"</span>) ? str.substring(1, str.length()) : str;
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>          }
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>      }
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>  
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>      @Override
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>      <strong class="jxr_keyword">public</strong> CommandLine parse(Options options, String[] arguments) <strong class="jxr_keyword">throws</strong> ParseException {
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>          List&lt;String&gt; knownArguments = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>          List&lt;String&gt; rawArguments = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>  
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>          <strong class="jxr_keyword">boolean</strong> is_option_arg = false;
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>          <strong class="jxr_keyword">int</strong> args_length = arguments.length;
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>  
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>          <strong class="jxr_keyword">for</strong>(<strong class="jxr_keyword">int</strong> i = 0; i &lt; args_length; ++i) {
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>              String arg = arguments[i];
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>              <strong class="jxr_keyword">if</strong> (arg.startsWith(<span class="jxr_string">"-"</span>) &amp;&amp; !<span class="jxr_string">"-"</span>.equals(arg)) { <em class="jxr_comment">// parser encountered an option</em>
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>                  String t = stripLeadingHyphens(arg);
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>                  <strong class="jxr_keyword">if</strong> (arg.startsWith(<span class="jxr_string">"--"</span>)) { <em class="jxr_comment">// option with long name</em>
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>                      <strong class="jxr_keyword">if</strong> (options.hasLongOption(t)) {
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>                          knownArguments.add(arg);
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>                          logger.debug(<span class="jxr_string">"Parsed an valid option: {}"</span>, t);
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>                      }<strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>                          <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> ParseException(<span class="jxr_string">"Unrecognized option: "</span> + arg);
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>                      }
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>                  }<strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (arg.startsWith(<span class="jxr_string">"-"</span>)) { <em class="jxr_comment">// option with short name</em>
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>                      <strong class="jxr_keyword">if</strong> (options.hasShortOption(t)) {
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>                          knownArguments.add(arg);
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>                          logger.debug(<span class="jxr_string">"Parsed an valid option: {}"</span>, t);
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>                      }<strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="L75" href="#L75">75</a>                          <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> ParseException(<span class="jxr_string">"Unrecognized option: "</span> + arg);
+<a class="jxr_linenumber" name="L76" href="#L76">76</a>                      }
+<a class="jxr_linenumber" name="L77" href="#L77">77</a>                  }
+<a class="jxr_linenumber" name="L78" href="#L78">78</a>                      is_option_arg = <strong class="jxr_keyword">true</strong>;
+<a class="jxr_linenumber" name="L79" href="#L79">79</a>              }<strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (is_option_arg) { <em class="jxr_comment">// parser encountered an option argument</em>
+<a class="jxr_linenumber" name="L80" href="#L80">80</a>                  knownArguments.add(arg);
+<a class="jxr_linenumber" name="L81" href="#L81">81</a>                  logger.debug(<span class="jxr_string">"Parsed an valid option argument: {}"</span>, arg);
+<a class="jxr_linenumber" name="L82" href="#L82">82</a>                  is_option_arg = false;
+<a class="jxr_linenumber" name="L83" href="#L83">83</a>              }<strong class="jxr_keyword">else</strong> { <em class="jxr_comment">// parser encounter an normal argument</em>
+<a class="jxr_linenumber" name="L84" href="#L84">84</a>                  rawArguments.add(arg);
+<a class="jxr_linenumber" name="L85" href="#L85">85</a>                  logger.debug(<span class="jxr_string">"Parsed an normal argument: {}"</span>, arg);
+<a class="jxr_linenumber" name="L86" href="#L86">86</a>              }
+<a class="jxr_linenumber" name="L87" href="#L87">87</a>          }
+<a class="jxr_linenumber" name="L88" href="#L88">88</a>          knownArguments.addAll(rawArguments);
+<a class="jxr_linenumber" name="L89" href="#L89">89</a>          <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">super</strong>.parse(options, knownArguments.toArray(<strong class="jxr_keyword">new</strong> String[knownArguments.size()]));
+<a class="jxr_linenumber" name="L90" href="#L90">90</a>      }
+<a class="jxr_linenumber" name="L91" href="#L91">91</a>  }
+<a class="jxr_linenumber" name="L92" href="#L92">92</a>  
+</pre>
+<hr/>
+<div id="footer">Copyright &#169; 2019. All rights reserved.</div>
+</body>
+</html>
